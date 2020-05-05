@@ -6,11 +6,10 @@ var nib = require('nib');
 var cssbeautify = require('gulp-cssbeautify');
 var plumber = require('gulp-plumber');
 var gutil = require('gulp-util');
-
-
+var webpack = require('webpack-stream')
 
 gulp.task('stylus', function () {
-  gulp.src('./source/stylus/*.styl') 
+  gulp.src('./source/stylus/*.styl')
   	.pipe(plumber(function (error) {
         gutil.log(error.message);
         this.emit('end');
@@ -53,18 +52,19 @@ gulp.task('webserver', function() {
 });
 
 gulp.task('script' , function() {
-  return gulp.src('./source/**/*.js')     
-	
+  return gulp.src('./source/**/*.js')
+	  .pipe(webpack( require('./webpack.config.js') ))
 	.pipe(gulp.dest('public/js'));
 });
 
 
 
 gulp.task('watch', function() {
-  gulp.watch('./source/**/*.jade', ['jade']); 
+  gulp.watch('./source/**/*.jade', ['jade']);
+  gulp.watch('./source/**/*.js', ['script']);
   gulp.watch('./source/**/*.styl', ['stylus']);
 
 });
 
 // The default task (called when you run `gulp` from cli)
-gulp.task('default', ['watch', 'stylus', 'jade', 'webserver']);
+gulp.task('default', ['watch', 'stylus', 'jade', 'script', 'webserver']);
